@@ -11,19 +11,20 @@ import (
 )
 
 type Training struct {
-	personaldata.Personal
-	Steps        int
-	TrainingType string
-	Duration     time.Duration
+	personaldata.Personal               // импорт структуры
+	Steps                 int           // количество шагов
+	TrainingType          string        // тип тренировки
+	Duration              time.Duration // время тренировки
 }
 
+// Парсинг входных данных
 func (t *Training) Parse(datastring string) (err error) {
-	dataToSlice := strings.Split(datastring, ",")
-	if len(dataToSlice) != 3 {
+	dataToSlice := strings.Split(datastring, ",") // разделение строки на слайс
+	if len(dataToSlice) != 3 {                    // проверка длины слайса
 		return fmt.Errorf("wrong incoming format")
 	}
 
-	t.Steps, err = strconv.Atoi(dataToSlice[0])
+	t.Steps, err = strconv.Atoi(dataToSlice[0]) // преобразование элемента слайса
 	if err != nil {
 		return fmt.Errorf("error in convertation steps: %w", err)
 	}
@@ -31,9 +32,9 @@ func (t *Training) Parse(datastring string) (err error) {
 		return fmt.Errorf("steps can't be less or equal zero")
 	}
 
-	t.TrainingType = dataToSlice[1]
+	t.TrainingType = dataToSlice[1] // преобразование элемента слайса
 
-	t.Duration, err = time.ParseDuration(dataToSlice[2])
+	t.Duration, err = time.ParseDuration(dataToSlice[2]) // преобразование элемента слайса
 	if err != nil {
 		return fmt.Errorf("error in convertation duration: %w", err)
 	}
@@ -43,6 +44,7 @@ func (t *Training) Parse(datastring string) (err error) {
 	return nil
 }
 
+// Вывод данных о тренировке
 func (t Training) ActionInfo() (string, error) {
 	distance := spentenergy.Distance(t.Steps, t.Height)
 	meanSpeed := spentenergy.MeanSpeed(t.Steps, t.Height, t.Duration)

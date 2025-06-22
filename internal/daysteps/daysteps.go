@@ -11,18 +11,19 @@ import (
 )
 
 type DaySteps struct {
-	personaldata.Personal
-	Steps    int
-	Duration time.Duration
+	personaldata.Personal               // импорт структуры
+	Steps                 int           // количество шагов
+	Duration              time.Duration // время прогулки
 }
 
+// Парсинг входных данных
 func (ds *DaySteps) Parse(datastring string) (err error) {
-	dataToSlice := strings.Split(datastring, ",")
-	if len(dataToSlice) != 2 {
+	dataToSlice := strings.Split(datastring, ",") // разделение строки на слайс
+	if len(dataToSlice) != 2 {                    // проверка длины слайса
 		return fmt.Errorf("wrong incoming format")
 	}
 
-	ds.Steps, err = strconv.Atoi(dataToSlice[0])
+	ds.Steps, err = strconv.Atoi(dataToSlice[0]) // преобразование элемента слайса
 	if err != nil {
 		return fmt.Errorf("error in convertation steps: %w", err)
 	}
@@ -30,7 +31,7 @@ func (ds *DaySteps) Parse(datastring string) (err error) {
 		return fmt.Errorf("steps can't be less or equal zero")
 	}
 
-	ds.Duration, err = time.ParseDuration(dataToSlice[1])
+	ds.Duration, err = time.ParseDuration(dataToSlice[1]) // преобразование элемента слайса
 	if err != nil {
 		return fmt.Errorf("error in convertation duration: %w", err)
 	}
@@ -40,6 +41,7 @@ func (ds *DaySteps) Parse(datastring string) (err error) {
 	return nil
 }
 
+// Вывод данных о прогулке
 func (ds DaySteps) ActionInfo() (string, error) {
 	if ds.Steps <= 0 {
 		return "", fmt.Errorf("steps can't be less or equal zero")
