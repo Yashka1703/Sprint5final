@@ -1,13 +1,73 @@
 package daysteps
 
+import (
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/Yandex-Practicum/tracker/internal/personaldata"
+	"github.com/Yandex-Practicum/tracker/internal/spentenergy"
+)
+
 type DaySteps struct {
-	// TODO: добавить поля
+	personaldata.Personal               // импорт структуры
+	Steps                 int           // количество шагов
+	Duration              time.Duration // время прогулки
 }
 
+// Парсинг входных данных
 func (ds *DaySteps) Parse(datastring string) (err error) {
-	// TODO: реализовать функцию
+	dataToSlice := strings.Split(datastring, ",") // разделение строки на слайс
+	if len(dataToSlice) != 2 {                    // проверка длины слайса
+		return fmt.Errorf("wrong incoming format")
+	}
+
+	ds.Steps, err = strconv.Atoi(dataToSlice[0]) // преобразование элемента слайса
+	if err != nil {
+		return fmt.Errorf("error in convertation steps: %w", err)
+	}
+	if ds.Steps <= 0 {
+		return fmt.Errorf("steps can't be less or equal zero")
+	}
+
+	ds.Duration, err = time.ParseDuration(dataToSlice[1]) // преобразование элемента слайса
+	if err != nil {
+		return fmt.Errorf("error in convertation duration: %w", err)
+	}
+	if ds.Duration <= 0 {
+		return fmt.Errorf("duration can't be less or equal zero")
+	}
+	return nil
 }
 
+// Вывод данных о прогулке
 func (ds DaySteps) ActionInfo() (string, error) {
-	// TODO: реализовать функцию
+	if ds.Steps <= 0 {
+		return "", fmt.Errorf("steps can't be less or equal zero")
+	}
+	if ds.Duration <= 0 {
+		return "", fmt.Errorf("duration can't be less or equal zero")
+	}
+	if ds.Height <= 0 {
+		return "", fmt.Errorf("height can't be less or equal zero")
+	}
+	if ds.Weight <= 0 {
+		return "", fmt.Errorf("weight can't be less or equal zero")
+	}
+	distance := spentenergy.Distance(ds.Steps, ds.Height)
+
+	calories, err := spentenergy.WalkingSpentCalories(ds.Steps, ds.Weight, ds.Height, ds.Duration)
+	if err != nil {
+		return "", nil
+	}
+
+	result := fmt.Sprintf("Количество шагов: %d.\n"+
+		"Дистанция составила %.2f км.\n"+
+		"Вы сожгли %.2f ккал.\n",
+		ds.Steps,
+		distance,
+		calories,
+	)
+	return result, nil
 }
